@@ -1,4 +1,3 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Reflection;
 public static class StaticProxy<TMember>
 {
     private static Dictionary<Type, Dictionary<string, TMember>> _dic = new Dictionary<Type, Dictionary<string, TMember>>();
-    public static TMember GetDelegate(string name, Type instanceType, TMember delegateMethod)
+    public static TMember GetSetDelegate(string name, Type instanceType, TMember delegateMethod)
     {
         //if delegate is instance method on TInstance it should not alter instance!
         if(_dic.ContainsKey(instanceType) == false) 
@@ -24,7 +23,7 @@ public static class StaticProxy<TMember>
         }
         return _dic[instanceType][name];
     }
-    public static TMember Get(string name, Type instanceType, Func<TMember> constructor)
+    public static TMember GetSet(string name, Type instanceType, Func<TMember> constructor)
     {
         if(_dic.ContainsKey(instanceType) == false) 
         {
@@ -43,15 +42,15 @@ public static class StaticProxy<TMember>
         {
             throw new Exception();
         }
-        return Get(name, instanceType, constructor);
+        return GetSet(name, instanceType, constructor);
     }
 }
 public static class StaticProxyExt
 {
-    public static TMember GetProxyMember<TMember>(this object o, string name, Func<TMember> constructor)
-        => StaticProxy<TMember>.Get(name, o.GetType(), constructor);
-    public static TMember GetProxyDelegate<TMember>(this object o, string name, TMember delegateMember)
-        => StaticProxy<TMember>.GetDelegate(name, o.GetType(), delegateMember);
+    public static TMember GetSetProxy<TMember>(this object o, string name, Func<TMember> constructor)
+        => StaticProxy<TMember>.GetSet(name, o.GetType(), constructor);
+    public static TMember GetSetDelegate<TMember>(this object o, string name, TMember delegateMember)
+        => StaticProxy<TMember>.GetSetDelegate(name, o.GetType(), delegateMember);
     public static TMember InitializeProxyMember<TMember>(this object o, string name, Func<TMember> constructor)
         =>  StaticProxy<TMember>.Initialize(name, o.GetType(), constructor);
 }
